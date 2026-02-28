@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
+plots_dir = '../plots'
+
 def perform_ttest(group1, group2, metric_name):
     # Drop NaNs
     g1_clean = group1.dropna()
@@ -56,6 +58,55 @@ def main():
     print("\n5. CONFIDENCE RATINGS")
     perform_ttest(nb_group['mean_confidence'], ab_group['mean_confidence'], "Confidence")
     
+    # -----------------------------------------------------
+    # Visualization Generation
+    # -----------------------------------------------------
+    print("\nGenerating Visualizations...")
+    
+    # Set style
+    sns.set_theme(style="whitegrid")
+    
+    # 1. Bar Plot for Accuracies (Overall, BB, EM)
+    # Melt the dataframe so we can plot multiple accuracy types side-by-side
+    acc_df = df[['group', 'accuracy', 'BB_accuracy', 'EM_accuracy']].melt(
+        id_vars='group', 
+        var_name='Metric', 
+        value_name='Accuracy'
+    )
+    
+    # Rename for cleaner plot labels
+    acc_df['Metric'] = acc_df['Metric'].replace({
+        'accuracy': 'Overall (REC/LDI)',
+        'BB_accuracy': 'Before Boundary',
+        'EM_accuracy': 'Event Middle'
+    })
+    
+    # Create directory if it doesn't exist
+    os.makedirs(plots_dir, exist_ok=True)
+    acc_barplot_path = os.path.join(plots_dir, 'accuracy_barplot.png')
+    plt.figure(figsize=(10, 6))
+    sns.barplot(data=acc_df, x='Metric', y='Accuracy', hue='group', palette=['#4c72b0', '#c44e52'], errorbar='ci')
+    plt.title('Recognition Memory Accuracy by Frame Type\n(Natural Cut vs. Abrupt Cut)', fontsize=14, pad=15)
+    plt.ylabel('Proportion Correct')
+    plt.xlabel('')
+    plt.ylim(0.7, 1.0) # Start y-axis at 0.7 to highlight the differences better since baseline is high
+    plt.legend(title='Condition', loc='upper right')
+    plt.tight_layout()
+    plt.savefig(acc_barplot_path, dpi=300)
+    print(f"Saved: {acc_barplot_path}")
+    
+    # 2. Box Plot for Response Times
+    rt_boxplot_path = os.path.join(plots_dir, 'rt_boxplot.png')
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(data=df, x='group', y='mean_rt', palette=['#4c72b0', '#c44e52'])
+    plt.title('Average Response Time during Recognition\n(Natural Cut vs. Abrupt Cut)', fontsize=14, pad=15)
+    plt.ylabel('Response Time (seconds)')
+    plt.xlabel('Condition')
+    plt.tight_layout()
+    plt.savefig(rt_boxplot_path, dpi=300)
+    print(f"Saved: {rt_boxplot_path}")
+    
+    print("\nAnalysis Complete!")
 
 if __name__ == '__main__':
     main()
