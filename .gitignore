@@ -1,3 +1,5 @@
 /BRSM data csv/
 venv/
 data/individual/
+data/individuals_cleaned/
+data/individuals_failed/
