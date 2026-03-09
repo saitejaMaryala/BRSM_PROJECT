@@ -49,7 +49,15 @@ def load_all_participants():
             
             # Extract participant info
             participant_id = csv_file.stem.split('_')[0]
-            condition = 'AB' if '_AB_' in csv_file.name else ('NB' if '_NB_' in csv_file.name else 'Unknown')
+            
+            # Robust condition check (handles spaces in filename)
+            fname_clean = csv_file.name.replace(" ", "")
+            if "_AB_" in fname_clean:
+                condition = 'AB'
+            elif "_NB_" in fname_clean:
+                condition = 'NB'
+            else:
+                condition = 'Unknown'
             
             # Add metadata columns
             df['participant_id'] = participant_id
@@ -177,105 +185,95 @@ def analyze_trial_performance(trial_data):
 
 def plot_trial_performance(trial_data):
     """
-    Create visualizations for trial performance.
+    Create visualizations for trial performance with adjusted scaling.
     """
     print("\nGenerating trial performance plots...")
     
-    # 1. Accuracy comparison
-    plt.figure(figsize=(8, 6))
-    accuracy_by_condition = trial_data.groupby('condition')['resp.corr'].mean() * 100
-    plt.bar(accuracy_by_condition.index, accuracy_by_condition.values, color=['#FF6B6B', '#4ECDC4'])
-    plt.ylabel('Accuracy (%)')
-    plt.title('Recognition Accuracy by Condition')
-    plt.ylim([0, 100])
-    plt.axhline(y=50, color='gray', linestyle='--', alpha=0.5, label='Chance')
-    plt.legend()
+    # Set a cleaner palette
+    palette = {'AB': '#FF6B6B', 'NB': '#4ECDC4'}
+
+    # 1. Accuracy comparison (Bar Plot - Slimmer)
+    plt.figure(figsize=(4, 6))
+    sns.barplot(x='condition', y='resp.corr', data=trial_data, 
+                palette=palette, ci=68, capsize=.1, errwidth=1.5)
+    plt.ylabel('Accuracy (Mean %)')
+    plt.title('Recognition Accuracy')
+    plt.ylim([0, 1])
+    plt.axhline(y=0.5, color='gray', linestyle='--', alpha=0.5)
     plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "accuracy_by_condition.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'accuracy_by_condition.png'}")
+    plt.savefig(PLOTS_DIR / "accuracy_by_condition.png", dpi=300)
     plt.close()
     
-    # 2. Response time boxplot
-    plt.figure(figsize=(8, 6))
-    trial_data.boxplot(column='resp.rt', by='condition')
+    # 2. Response time boxplot (Narrower Box)
+    plt.figure(figsize=(4, 6))
+    sns.boxplot(x='condition', y='resp.rt', data=trial_data, 
+                palette=palette, width=0.5) # width controls box thickness
     plt.ylabel('Response Time (seconds)')
-    plt.title('Response Time by Condition')
-    plt.xlabel('Condition')
-    plt.suptitle('')  # Remove the automatic title
+    plt.title('RT by Condition')
     plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "rt_by_condition.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'rt_by_condition.png'}")
+    plt.savefig(PLOTS_DIR / "rt_by_condition.png", dpi=300)
     plt.close()
     
-    # 3. Confidence ratings boxplot
-    plt.figure(figsize=(8, 6))
-    trial_data.boxplot(column='conf_radio.response', by='condition')
+    # 3. Confidence ratings boxplot (Narrower Box)
+    plt.figure(figsize=(4, 6))
+    sns.boxplot(x='condition', y='conf_radio.response', data=trial_data, 
+                palette=palette, width=0.5)
     plt.ylabel('Confidence Rating (1-5)')
     plt.title('Confidence by Condition')
-    plt.xlabel('Condition')
-    plt.suptitle('')  # Remove the automatic title
     plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "confidence_by_condition.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'confidence_by_condition.png'}")
+    plt.savefig(PLOTS_DIR / "confidence_by_condition.png", dpi=300)
     plt.close()
     
-    # 4. Accuracy distribution
-    plt.figure(figsize=(8, 6))
-    for condition in ['AB', 'NB']:
-        data = trial_data[trial_data['condition']==condition]['resp.corr'] * 100
-        plt.hist(data, alpha=0.6, label=condition, bins=2, edgecolor='black')
-    plt.xlabel('Accuracy (%)')
-    plt.ylabel('Frequency')
-    plt.title('Distribution of Trial Accuracy')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "accuracy_distribution.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'accuracy_distribution.png'}")
-    plt.close()
+    # 4. Accuracy & RT Distribution (Wider for clarity)
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     
-    # 5. RT distribution
-    plt.figure(figsize=(8, 6))
-    for condition in ['AB', 'NB']:
-        data = trial_data[trial_data['condition']==condition]['resp.rt'].dropna()
-        plt.hist(data, alpha=0.6, label=condition, bins=30, edgecolor='black')
-    plt.xlabel('Response Time (s)')
-    plt.ylabel('Frequency')
-    plt.title('Distribution of Response Times')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "rt_distribution.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'rt_distribution.png'}")
-    plt.close()
+    # RT Distribution
+    sns.histplot(data=trial_data, x='resp.rt', hue='condition', 
+                 kde=True, element="step", palette=palette, ax=axes[0])
+    axes[0].set_title('Distribution of Response Times')
     
-    # 6. Confidence distribution
-    plt.figure(figsize=(8, 6))
-    for condition in ['AB', 'NB']:
-        data = trial_data[trial_data['condition']==condition]['conf_radio.response'].dropna()
-        plt.hist(data, alpha=0.6, label=condition, bins=5, edgecolor='black', range=(0.5, 5.5))
-    plt.xlabel('Confidence Rating')
-    plt.ylabel('Frequency')
-    plt.title('Distribution of Confidence Ratings')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "confidence_distribution.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'confidence_distribution.png'}")
-    plt.close()
+    # Confidence Distribution
+    sns.countplot(data=trial_data, x='conf_radio.response', hue='condition', 
+                  palette=palette, ax=axes[1])
+    axes[1].set_title('Distribution of Confidence Ratings')
     
-    # 7. Accuracy by confidence
-    plt.figure(figsize=(8, 6))
-    conf_accuracy = trial_data.groupby(['condition', 'conf_radio.response'])['resp.corr'].mean() * 100
-    conf_accuracy = conf_accuracy.reset_index()
-    for condition in ['AB', 'NB']:
-        data = conf_accuracy[conf_accuracy['condition']==condition]
-        plt.plot(data['conf_radio.response'], data['resp.corr'], marker='o', label=condition, linewidth=2)
-    plt.xlabel('Confidence Rating')
+    plt.tight_layout()
+    plt.savefig(PLOTS_DIR / "trial_distributions_combined.png", dpi=300)
+    plt.close()
+
+def plot_participant_distributions(participant_stats):
+    """
+    Plot participant-level distributions with improved spacing.
+    """
+    print("\nGenerating participant-level plots...")
+    palette = {'AB': '#FF6B6B', 'NB': '#4ECDC4'}
+    
+    # 1. Accuracy Violin Plot (Better than just a histogram for small N)
+    plt.figure(figsize=(6, 6))
+    sns.violinplot(x='condition', y='accuracy', data=participant_stats, 
+                   palette=palette, inner="quartile")
+    sns.stripplot(x='condition', y='accuracy', data=participant_stats, 
+                  color="black", alpha=0.3) # Overlay raw data points
     plt.ylabel('Accuracy (%)')
-    plt.title('Accuracy by Confidence Level')
-    plt.legend()
-    plt.xticks([1, 2, 3, 4, 5])
+    plt.title('Participant Accuracy Distribution')
+    plt.axhline(y=50, color='gray', linestyle='--', alpha=0.5)
     plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "accuracy_by_confidence.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'accuracy_by_confidence.png'}")
+    plt.savefig(PLOTS_DIR / "participant_accuracy_violin.png", dpi=300)
+    plt.close()
+
+    # 2. Combined Participant Distributions (Wider layout)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    
+    sns.kdeplot(data=participant_stats, x='mean_rt', hue='condition', 
+                fill=True, palette=palette, ax=ax1)
+    ax1.set_title('Mean RT Density per Participant')
+    
+    sns.kdeplot(data=participant_stats, x='mean_confidence', hue='condition', 
+                fill=True, palette=palette, ax=ax2)
+    ax2.set_title('Mean Confidence Density per Participant')
+    
+    plt.tight_layout()
+    plt.savefig(PLOTS_DIR / "participant_densities.png", dpi=300)
     plt.close()
 
 def analyze_participant_level(trial_data):
@@ -316,75 +314,6 @@ def analyze_participant_level(trial_data):
     print(f"\nSaved: {TABLES_DIR / 'participant_level_stats.csv'}")
     
     return participant_stats
-
-def plot_participant_distributions(participant_stats):
-    """
-    Plot participant-level distributions.
-    """
-    print("\nGenerating participant-level plots...")
-    
-    # 1. Accuracy distribution by condition
-    plt.figure(figsize=(8, 6))
-    for condition in ['AB', 'NB']:
-        data = participant_stats[participant_stats['condition']==condition]['accuracy'].dropna()
-        if len(data) > 0:
-            plt.hist(data, alpha=0.6, label=condition, bins=15, edgecolor='black')
-    plt.xlabel('Accuracy (%)')
-    plt.ylabel('Number of Participants')
-    plt.title('Distribution of Participant Accuracy')
-    plt.axvline(x=50, color='gray', linestyle='--', alpha=0.5, label='Chance')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "participant_accuracy_distribution.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'participant_accuracy_distribution.png'}")
-    plt.close()
-    
-    # 2. Mean RT distribution
-    plt.figure(figsize=(8, 6))
-    for condition in ['AB', 'NB']:
-        data = participant_stats[participant_stats['condition']==condition]['mean_rt'].dropna()
-        if len(data) > 0:
-            plt.hist(data, alpha=0.6, label=condition, bins=15, edgecolor='black')
-    plt.xlabel('Mean Response Time (s)')
-    plt.ylabel('Number of Participants')
-    plt.title('Distribution of Mean RT per Participant')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "participant_rt_distribution.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'participant_rt_distribution.png'}")
-    plt.close()
-    
-    # 3. Mean confidence distribution
-    plt.figure(figsize=(8, 6))
-    for condition in ['AB', 'NB']:
-        data = participant_stats[participant_stats['condition']==condition]['mean_confidence'].dropna()
-        if len(data) > 0:
-            plt.hist(data, alpha=0.6, label=condition, bins=15, edgecolor='black')
-    plt.xlabel('Mean Confidence Rating')
-    plt.ylabel('Number of Participants')
-    plt.title('Distribution of Mean Confidence per Participant')
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig(PLOTS_DIR / "participant_confidence_distribution.png", dpi=300, bbox_inches='tight')
-    print(f"Saved: {PLOTS_DIR / 'participant_confidence_distribution.png'}")
-    plt.close()
-    
-    # 4. Violin plot for accuracy
-    plt.figure(figsize=(8, 6))
-    data_ab = participant_stats[participant_stats['condition']=='AB']['accuracy'].dropna()
-    data_nb = participant_stats[participant_stats['condition']=='NB']['accuracy'].dropna()
-    
-    if len(data_ab) > 0 and len(data_nb) > 0:
-        data_to_plot = [data_ab, data_nb]
-        parts = plt.violinplot(data_to_plot, positions=[1, 2], showmeans=True, showmedians=True)
-        plt.ylabel('Accuracy (%)')
-        plt.title('Accuracy Distribution by Condition (Violin Plot)')
-        plt.xticks([1, 2], ['AB', 'NB'])
-        plt.axhline(y=50, color='gray', linestyle='--', alpha=0.5)
-        plt.tight_layout()
-        plt.savefig(PLOTS_DIR / "participant_accuracy_violin.png", dpi=300, bbox_inches='tight')
-        print(f"Saved: {PLOTS_DIR / 'participant_accuracy_violin.png'}")
-    plt.close()
 
 def analyze_demographics(demo_df, participant_stats):
     """
