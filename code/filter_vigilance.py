@@ -13,8 +13,8 @@ from pathlib import Path
 
 # Define paths
 DATA_DIR = Path("../data/individual")
-OUTPUT_DIR = Path("../data/individuals_cleaned")
-FAILED_DIR = Path("../data/individuals_failed")  # Optional: to store failed files
+OUTPUT_DIR = Path("../data/individuals_cleaned_again")
+FAILED_DIR = Path("../data/individuals_failed_again")  # Optional: to store failed files
 
 # Create output directories if they don't exist
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
