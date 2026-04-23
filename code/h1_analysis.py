@@ -47,6 +47,8 @@ def load_data():
             
             # Determine condition
             condition = 'AB' if '_AB_' in csv_file.name else ('NB' if '_NB_' in csv_file.name else 'Unknown')
+            if condition == 'Unknown':
+                continue
             participant_id = csv_file.stem.split('_')[0]
             
             # Extract trial data (where multiple choice input exists)
@@ -162,6 +164,34 @@ def perform_mann_whitney(data, variable, title):
     plt.savefig(OUTPUT_DIR / f'hypothesis_{variable}_bar.png', dpi=300)
     plt.close()
 
+
+def plot_distribution_diagnostics(data, variable, title):
+    """Save a histogram and Q-Q plot so the distribution shape is visible before testing."""
+    plot_data = data[data['condition'].isin(['AB', 'NB'])].copy()
+    ab_data = plot_data[plot_data['condition'] == 'AB'][variable].dropna()
+    nb_data = plot_data[plot_data['condition'] == 'NB'][variable].dropna()
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    sns.histplot(data=plot_data, x=variable, hue='condition', kde=True,
+                 palette={'AB': '#FF6B6B', 'NB': '#4ECDC4'}, bins=15, ax=axes[0])
+    axes[0].set_title(f'{title} Distribution')
+    axes[0].set_xlabel(variable.replace('_', ' ').title())
+
+    stats.probplot(ab_data, dist='norm', plot=axes[1])
+    axes[1].get_lines()[0].set_markerfacecolor('#FF6B6B')
+    axes[1].get_lines()[0].set_markeredgecolor('#FF6B6B')
+    stats.probplot(nb_data, dist='norm', plot=axes[1])
+    axes[1].get_lines()[2].set_markerfacecolor('#4ECDC4')
+    axes[1].get_lines()[2].set_markeredgecolor('#4ECDC4')
+    axes[1].set_title(f'Q-Q Plot for {title}')
+    axes[1].set_xlabel('Theoretical Quantiles')
+    axes[1].set_ylabel('Ordered Values')
+
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / f'normality_{variable}.png', dpi=300)
+    plt.close()
+
 def main():
     print("Loading data and calculating participant metrics...")
     df = load_data()
@@ -169,6 +199,9 @@ def main():
     if df is None or df.empty:
         print("No valid data loaded")
         return
+
+    plot_distribution_diagnostics(df, 'accuracy', 'Participant Mean Accuracy')
+    plot_distribution_diagnostics(df, 'median_rt', 'Participant Median Response Time')
         
     # Test H1a: Accuracy (Is NB > AB?)
     perform_mann_whitney(df, 'accuracy', 'Participant Mean Accuracy')

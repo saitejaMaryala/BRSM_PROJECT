@@ -1,0 +1,515 @@
+\documentclass[11pt, a4paper]{article}
+
+% ── Fonts ────────────────────────────────────────────────────
+\usepackage{mathpazo} % Palatino for body + math
+\usepackage[scaled=0.92]{helvet}
+\renewcommand{\familydefault}{\rmdefault}
+
+% ── Core layout ──────────────────────────────────────────────
+\usepackage[top=2cm, bottom=2cm, left=2cm, right=2cm]{geometry}
+\usepackage{setspace}
+\usepackage{subcaption}
+\setstretch{1.15}
+\usepackage[parfill]{parskip}
+\setlength{\parindent}{0pt}
+
+% ── Graphics & colour ────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage[dvipssets,table]{xcolor}
+
+\definecolor{accent}{RGB}{25, 60, 110}       % deep navy
+\definecolor{accentlight}{RGB}{220, 230, 245} % pale blue fill
+\definecolor{accentmid}{RGB}{100, 140, 200}   % mid blue rule
+\definecolor{textgrey}{RGB}{90, 90, 90}
+\definecolor{rulegrey}{RGB}{200, 200, 200}
+
+% ── Tables & floats ──────────────────────────────────────────
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{mdframed}
+
+\captionsetup{
+  font={small, color=textgrey},
+  labelfont={bf, color=accent},
+  labelsep=period,
+  skip=6pt
+}
+\captionsetup[sub]{font=footnotesize, labelfont=bf}
+
+% ── Maths ────────────────────────────────────────────────────
+\usepackage{amsmath, amssymb}
+
+% ── Hyperlinks ───────────────────────────────────────────────
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=accent,
+  citecolor=accent,
+  urlcolor=accentmid,
+  pdftitle={Memory Encoding Across Event Boundaries: Report 1},
+  pdfauthor={Farzana S, Rudra Choudhary, Sai Teja Maryala}
+}
+
+% ── Header / footer ──────────────────────────────────────────
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{%
+  \color{textgrey}\small\textit{Memory Encoding Across Event Boundaries}}
+\fancyhead[R]{\color{textgrey}\small Report 1}
+\fancyfoot[C]{\color{textgrey}\small\thepage}
+
+% ── Section headings ─────────────────────────────────────────
+\usepackage{titlesec}
+
+\titleformat{\section}{%
+  \large\bfseries\color{accent}}{}{0em}{%
+  \thesection.\enspace}[\vspace{-2pt}{\color{accentmid}\titlerule[0.6pt]}\vspace{4pt}]
+
+\titleformat{\subsection}{%
+  \normalsize\bfseries\color{accent!80!black}}{}{0em}{\thesubsection\enspace}
+
+\titlespacing*{\section}{0pt}{18pt}{6pt}
+\titlespacing*{\subsection}{0pt}{12pt}{4pt}
+
+% ── Enumitem ─────────────────────────────────────────────────
+\usepackage{enumitem}
+\setlist{noitemsep, topsep=2pt, leftmargin=1.5em}
+
+% ── Natbib ───────────────────────────────────────────────────
+\usepackage{natbib}
+
+% ── Hypothesis boxes ─────────────────────────────────────────
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{hypobox}[1]{
+  enhanced,
+  breakable,
+  colback   = accentlight,
+  colframe  = accent,
+  leftrule  = 3pt,
+  toprule   = 0pt,
+  bottomrule= 0pt,
+  rightrule = 0pt,
+  arc       = 0pt,
+  boxsep    = 0pt,
+  left      = 8pt,
+  right     = 8pt,
+  top       = 6pt,
+  bottom    = 6pt,
+  fontupper = \small,
+  title     = {\small\bfseries\color{accent} #1},
+  attach boxed title to top left = {yshift=-0.5mm},
+  boxed title style = {
+    colback=accentlight, colframe=accentlight,
+    left=0pt, right=0pt, top=0pt, bottom=1pt
+  }
+}
+
+% ── Misc ─────────────────────────────────────────────────────
+\usepackage{microtype}
+\usepackage{mdframed}
+
+% ═══════════════════════════════════════════════════════════════
+\begin{document}
+\thispagestyle{empty}
+
+% ── Title page ───────────────────────────────────────────────
+\begin{titlepage}
+
+% Top rule + course label
+{\color{accent}\hrule height 2pt}
+\vspace{6pt}
+{\footnotesize\color{textgrey}%
+  \textsc{Behavioural Research: Statistical Methods}\hfill\textsc{Report 1}\par}
+\vspace{6pt}
+{\color{rulegrey}\hrule height 0.4pt}
+
+\vspace{2.8cm}
+
+% Title block
+{\fontsize{20}{26}\selectfont\bfseries\color{accent}
+Memory Encoding Across Event Boundaries\par}
+
+\vspace{0.5cm}
+{\large\color{textgrey}\itshape
+How do disruptions in video continuity affect memory encoding?\par}
+
+\vspace{2.5cm}
+
+% Authors
+{\normalsize
+\begin{tabular}{@{}ll@{}}
+  \textbf{Farzana S}        & \textcolor{textgrey}{2024121006} \\[5pt]
+  \textbf{Rudra Choudhary}  & \textcolor{textgrey}{2024121012} \\[5pt]
+  \textbf{Sai Teja Maryala} & \textcolor{textgrey}{2024121007} \\
+\end{tabular}\par}
+
+\vfill
+
+{\color{rulegrey}\rule{\linewidth}{0.4pt}}\\[6pt]
+{\small\color{textgrey}\today}
+
+\end{titlepage}
+
+\clearpage
+\setcounter{page}{1}
+
+% =============================================================
+\section{Background}
+
+Event Segmentation Theory (EST; \citealt{zacks2007event}) posits that the brain parses continuous streams of experience into discrete units called events. This process is driven by prediction errors: when an activity becomes less predictable, event models in working memory are updated, resulting in the perception of an event boundary. Experimental evidence suggests that these boundaries are crucial for memory. For instance, \citet{boltz1992temporal} found that commercials inserted at natural event boundaries improved recall, whereas those placed at non-boundaries impaired it.
+
+The Event Horizon Model \citep{radvansky2017event} further suggests that these boundaries act as anchors in long-term memory, facilitating the organization and retrieval of information. Research by \citet{schwan2004discontinuities} demonstrated that deleting time segments from a boundary impairs recall more significantly than deleting segments from within an event. Perceptually, film-editing techniques like abrupt cuts, motion changes, and shifts in lighting serve as bottom-up cues that trigger these boundaries \citep{cutting2012hollywood}. At the item level, objects appearing at event boundaries show superior encoding compared to those within events, a phenomenon known as the boundary advantage \citep{swallow2009operation}.
+
+% =============================================================
+\section{Research Hypotheses}
+
+\newcommand{\hypothesis}[3]{%
+  \par\noindent
+  \begin{tabularx}{\linewidth}{@{} >{\raggedleft\arraybackslash}p{45pt} X @{}}
+    \small\sffamily\bfseries\textcolor{accent}{#1} & 
+    \small\bfseries\textcolor{accent}{#2} \\
+    & \small #3
+  \end{tabularx}
+  \par\vspace{8pt}
+  {\color{accentlight}\hrule height 0.5pt}
+  \vspace{10pt}
+}
+
+{\color{accent}\hrule height 1.5pt}
+\vspace{12pt}
+
+\hypothesis{H1}{Overall Recognition Performance}{%
+  Participants who viewed \textbf{Natural Cut} videos will show higher recognition accuracy and faster response times compared to those who viewed \textbf{Abrupt Cut} videos.}
+
+\hypothesis{H2}{Boundary-Related Memory Effects}{%
+  Recognition accuracy for \textbf{Before Boundary (BB)} frames will be significantly higher in the Natural Cut group, reflecting preserved event continuity.}
+
+\hypothesis{H3}{Event-Middle Frame Robustness}{%
+  Recognition performance for \textbf{Event-Middle (EM)} frames will not differ significantly between groups, as these frames are less sensitive to boundary manipulations.}
+
+\hypothesis{H4}{Response Confidence Differences}{%
+  Natural Cut participants are expected to report higher confidence ratings for correct recognitions compared to the Abrupt Cut group.}
+
+\hypothesis{H5}{Recollection vs.\ Familiarity}{%
+  Abrupt boundary disruptions are expected to reduce high-confidence (recollection-based) recognition while leaving lower-confidence familiarity-based recognition relatively unaffected.}
+
+\vspace{8pt}
+
+\subsection*{Analysis Scope}
+For the current mid-submission, H1 H2 and H3 are analysed using non-parametric group comparisons (Mann-Whitney U) on raw recognition accuracy.\footnote{All analysis code is available \href{https://github.com/saitejaMaryala/BRSM_PROJECT}{here}.} In the final submission, these hypotheses will be further evaluated using a 2$\times$2 Mixed ANOVA with the bias-corrected Recognition Memory Index (REC) as the dependent variable, allowing a direct test of the Cut Type $\times$ Frame Type interaction. Hypotheses H4 and H5 will also be tested in the second half.
+
+% =============================================================
+\section{Experiment Overview}
+
+Participants watched 40 short videos that were segmented by independent annotators into coarse-grained event boundaries. Two experimental conditions were established:
+
+\begin{itemize}
+    \item \textbf{Natural Cut (NB):} Videos ended at their original, uninterrupted timelines, preserving natural boundaries.
+    \item \textbf{Abrupt Cut (AB):} Videos were subtly interrupted 1--5 seconds before a consensus event boundary and resumed at the start of a new event onset.
+\end{itemize}
+
+During the encoding phase, five videos were repeated as a vigilance check. Participants were excluded if their encoding duration exceeded 27.05 minutes (accounting for the 5.6 minutes of repeated video and 25 seconds for each skip). In the recognition phase, participants performed a target-lure task with a 5-point confidence scale.
+
+After excluding participants due to data errors and those failing vigilance checks, the final analysis included 166 valid participants: 87 in the Natural Cut group and 78 in the Abrupt Cut group.
+
+% =============================================================
+\section{Planned Analyses}
+
+The primary analysis is a \textbf{2$\times$2 Mixed ANOVA} with Cut Type (NB vs.\ AB) as the between-subjects factor and Frame Type (BB vs.\ EM) as the within-subjects factor. The dependent variable is the Recognition Memory Index (REC). This model uniquely accounts for variation between participants and variation across different frame types within the same participant. A significant interaction effect is expected, testing whether the relationship between EM and BB frames changes based on the cut type (H3).
+
+Secondary metrics include the Lure Discrimination Index (LDI) to measure high-fidelity memory and reaction times (RT) to assess cognitive efficiency.
+
+% =============================================================
+\section{Analysis Metrics}
+
+\begin{itemize}
+    \item \textbf{Recognition Memory Index (REC):} This metric measures the participant's ability to discriminate previously seen target items from completely novel items (foils). It incorporates a bias correction by subtracting the false alarm rate from the hit rate.
+    \[
+    \text{REC} = P(\text{"old"} \mid \text{Target}) - P(\text{"old"} \mid \text{Foil})
+    \]
+
+    \item \textbf{Lure Discrimination Index (LDI):} This metric assesses high-fidelity mnemonic discrimination. It measures the ability to distinguish a "lure" (an item similar to the target but not identical) from a completely new foil. A higher LDI indicates more detailed memory encoding.
+    \[
+    \text{LDI} = P(\text{"similar"} \mid \text{Lure}) - P(\text{"similar"} \mid \text{Foil})
+    \]
+\end{itemize}
+
+% =============================================================
+\section{Preliminary Results}
+
+\subsection{Descriptive Statistics}
+
+Table 1 summarizes the key performance metrics across the two conditions. Participants in the Natural Cut condition achieved a higher mean accuracy compared to the Abrupt Cut condition. Response times were largely similar, with the Natural Cut group responding slightly slower than the Abrupt Cut group. Confidence ratings were higher for the Natural Cut condition relative to the Abrupt Cut condition.
+
+\begin{table}[h]
+\centering
+\caption{Summary of Trial Performance Metrics by Condition}
+\begin{tabular}{lcc}
+\toprule
+Metric & Abrupt Cut (AB) & Natural Cut (NB) \\
+\midrule
+Accuracy (\%) & 83.76 & 87.04 \\
+Mean RT (s) & 5.58 & 5.76 \\
+Mean Confidence & 4.07 & 4.20 \\
+\bottomrule
+\end{tabular}
+\label{tab:summary_stats}
+\end{table}
+
+\subsection{Visualisations and Initial Findings}
+
+Analysis of the primary outcome measures (Figure~\ref{fig:distributions}) suggests a clear benefit for event continuity. The NB group showed an accuracy advantage over the AB group (Figure~\ref{fig:acc_bar}), supporting H1. While response times were similar (Figure~\ref{fig:rt_box}), the AB condition produced more extreme outliers, hinting at occasional processing difficulties. Furthermore, the AB group exhibited a wider spread in confidence ratings (Figure~\ref{fig:conf_box}), suggesting that boundary disruptions may undermine subjective certainty (H4).
+
+The relationship between confidence and accuracy (Figure~\ref{fig:acc_conf}) provides deeper insight into the underlying memory mechanisms. While both groups show a monotonic increase in accuracy as confidence rises, the NB advantage is most pronounced at high-confidence levels. At lower confidence levels, performance converges. This supports H5, suggesting that abrupt cuts specifically impair recollection-based memory, while leaving general familiarity largely intact.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/accuracy_by_condition.png}
+    \caption{Recognition accuracy by condition.}
+    \label{fig:acc_bar}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/rt_by_condition.png}
+    \caption{Response time by condition.}
+    \label{fig:rt_box}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.32\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{figures/confidence_by_condition.png}
+    \caption{Confidence rating by condition.}
+    \label{fig:conf_box}
+  \end{subfigure}
+  \caption{Distributions of accuracy, response time, and confidence across the NB and AB conditions.}
+  \label{fig:distributions}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.65\textwidth]{figures/accuracy_by_confidence.png}
+  \caption{Mean recognition accuracy as a function of confidence rating for the NB and AB conditions.}
+  \label{fig:acc_conf}
+\end{figure}
+
+
+\section{Recognition Memory Analyses}
+
+\subsection{Normality Assessment}
+Before conducting comparative statistical tests for all three hypotheses, participant-level mean accuracy and response times were assessed for normality using the Shapiro-Wilk test. All metrics significantly violated the assumption of normality.
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{l l c c c}
+        \toprule
+        \textbf{Hypothesis} & \textbf{Condition} & \textbf{Statistic} & \textbf{p-value} & \textbf{Normality} \\
+        \midrule
+        H1: Overall Accuracy      & Abrupt Cut  & 0.9567 & 0.0091    & Not normal \\
+                                  & Normal Cut & 0.9419 & 0.0007    & Not normal \\
+        \addlinespace
+        H1: Response Times        & Abrupt Cut  & 0.8817 & <0.0000   & Not normal \\
+                                  & Normal Cut & 0.9512 & 0.0025    & Not normal \\
+        \addlinespace
+        H2: BB Frame Accuracy     & Abrupt Cut  & 0.9475 & 0.0027    & Not normal \\
+                                  & Normal Cut & 0.9218 & 0.0001    & Not normal \\
+        \addlinespace
+        H3: EM Frame Accuracy     & Abrupt Cut  & 0.9226 & 0.0001    & Not normal \\
+                                  & Normal Cut & 0.9183 & 0.0000    & Not normal \\
+        \bottomrule
+    \end{tabular}
+    \caption{Shapiro-Wilk normality test results for accuracy and response times across hypotheses and conditions.}
+    \label{tab:normality}
+\end{table}
+
+\emph{See Figures~\ref{fig:h1_qq}, \ref{fig:h2_qq}, and \ref{fig:h3_qq} for Q-Q plots.}
+
+% ------------------------------------------------------------
+
+\subsection{Hypothesis 1: Overall Accuracy and Response Times}
+\textbf{Hypothesis:} Participants who viewed Naturally cut videos are expected to show higher recognition accuracy and faster response times (RTs) compared to those who viewed Abruptly cut videos.
+
+\textbf{Statistical Comparison:} Due to non-normality, the Mann-Whitney U Test was used.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l l l l l l l}
+        \toprule
+        \textbf{Measure} & \textbf{Condition} & \textbf{Median} & \textbf{U} & \textbf{p-value} & \textbf{Significance} & \textbf{Effect Size ($r$)} \\
+        \midrule
+        Accuracy      & Natural Cut (NB)  & 87.5\% & 4254.5 & 0.0078 & Significant & -0.2380 \\
+                      & Abrupt Cut (AB)   & 85.0\% &       &        &             &         \\
+        Response Time & Natural Cut (NB)  & 4.49s  & 3814.0 & 0.2228 & Not Significant & -0.1099 \\
+                      & Abrupt Cut (AB)   & 4.33s  &       &        &             &         \\
+        \bottomrule
+    \end{tabular}
+    \caption{Mann-Whitney U test results for H1.}
+    \label{tab:h1_results}
+\end{table}
+
+The results indicate that participants exposed to Natural Cuts demonstrated significantly higher recognition accuracy than those exposed to Abrupt Cuts, supporting the hypothesis that event continuity aids memory encoding. The effect size ($r = -0.2380$) suggests this is a small-to-medium, but reliable, improvement. However, there was no significant difference in response times, indicating that editing style did not influence the speed of recognition decisions. This suggests that while natural event boundaries enhance memory, they do not necessarily make retrieval faster.
+
+\emph{See Figure~\ref{fig:h1_barplot} for accuracy bar plot.}
+
+\begin{figure}[ht]
+    \centering
+    
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/h1/image.png}
+        \caption{Q-Q plot for H1 normality assessment.}
+        \label{fig:h1_qq}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.40\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/h1/hypothesis_accuracy_bar.png}
+        \caption{Bar plot comparing mean recognition accuracy.}
+        \label{fig:h1_barplot}
+    \end{subfigure}
+
+    \caption{Normality assessment and accuracy comparison for Hypothesis 1.}
+    \label{fig:h1_combined}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.35\textwidth]{figures/h1/hypothesis_median_rt_bar.png} % Substitute with your actual RT bar plot file, e.g. exploration_output/h1_analysis/hypothesis_rt_bar.png
+    \caption{Bar plot comparing participant median response times (RTs).}
+    \label{fig:h1_rt_barplot}
+\end{figure}
+
+% ------------------------------------------------------------
+
+\subsection{Hypothesis 2: Boundary-Related Memory Effects}
+\textbf{Hypothesis:} Recognition accuracy for pre-boundary frames is predicted to be higher in the Natural Cut group than in the Abrupt Cut group.
+
+\paragraph{Statistical Comparison}
+Mann-Whitney U Test:
+\begin{itemize}
+    \item NB Median = 85.0\%, AB Median = 85.0\%, $U = 4192.5$, $p = 0.0133$ (Significant), $r = -0.2200$
+\end{itemize}
+\emph{See Figure~\ref{fig:h2_raincloud} for BB accuracy raincloud plot.}
+
+
+Although both groups had the same median accuracy for Before Boundary frames, the distribution of scores differed: the Abrupt Cut group had more participants with lower scores, as revealed by the Mann-Whitney U test. This supports the hypothesis that natural event boundaries protect memory for information just before a cut, while abrupt editing disrupts this process. The effect size ($r = -0.2200$) is small-to-medium, indicating a consistent but not overwhelming penalty for abrupt editing at event boundaries.
+\begin{figure}[ht]
+    \centering
+    
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/h2/image.png}
+        \caption{Q-Q plot for H2 normality assessment.}
+        \label{fig:h2_qq}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/h2/hypothesis_accuracy_bb_raincloud.png}
+        \caption{Raincloud plot for H2 BB accuracy comparison.}
+        \label{fig:h2_raincloud}
+    \end{subfigure}
+
+    \caption{Normality assessment and accuracy comparison for Hypothesis 2.}
+    \label{fig:h2_combined}
+\end{figure}
+
+
+
+% ------------------------------------------------------------
+
+\subsection{Hypothesis 3: Event-Middle Memory Effects}
+
+\textbf{Hypothesis:} Recognition accuracy for Event-Middle (EM) frames is predicted to show no significant difference between groups.
+
+\begin{table}[H]
+    \centering
+    \small
+    \begin{tabular}{l l c c c c}
+        \toprule
+        \textbf{Condition} & \textbf{Median} & \textbf{U} & \textbf{p-value} & \textbf{Effect Size ($r$)} & \textbf{Result} \\
+        \midrule
+        Natural Cut & 90.0\% & \multirow{2}{*}{4087.5} & \multirow{2}{*}{0.0322} & \multirow{2}{*}{-0.1894} & Significant \\
+        Abrupt Cut  & 85.0\% & & & & (Hypothesis Rejected) \\
+        \bottomrule
+    \end{tabular}
+    \caption{Mann-Whitney U Test results for Event-Middle (EM) frame accuracy.}
+\end{table}
+
+\emph{See Figure~\ref{fig:h3_raincloud} for EM accuracy raincloud plot.}
+
+Contrary to the hypothesis, a significant difference was found: the Natural Cut group outperformed the Abrupt Cut group even for Event-Middle frames, though the effect size ($r = -0.1894$) is small. This suggests that the disruptive effect of abrupt editing may extend beyond event boundaries, subtly impairing memory for content throughout the event. The result highlights that editing style can have a broader impact on memory than previously assumed, affecting not only boundary-adjacent information but also more central event content.
+
+\begin{figure}[ht]
+    \centering
+    
+    \begin{subfigure}{0.40\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/h3/image.png}
+        \caption{Q-Q plot for H3 normality assessment.}
+        \label{fig:h3_qq}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.55\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{figures/h3/hypothesis_accuracy_em_raincloud.png}
+        \caption{Raincloud plot for H3 EM accuracy comparison.}
+        \label{fig:h3_raincloud}
+    \end{subfigure}
+
+    \caption{Normality assessment and accuracy comparison for Hypothesis 3.}
+    \label{fig:h3_combined}
+\end{figure}
+
+\section{Summary}
+
+Our preliminary findings align with Event Segmentation Theory. Disrupting a video just before a natural boundary appears to impose a measurable cost on memory encoding. The Natural Cut group consistently outperformed the Abrupt Cut group in accuracy and confidence, even though the absolute differences were modest.
+
+The data suggests a selective impairment: the "boundary advantage" seems tied to high-confidence recollection. When event boundaries are preserved, they likely act as scaffolds for high-fidelity memory; when they are disrupted, the resulting memory trace is weaker and less detailed. The next phase of analysis will determine if these effects are statistically significant and if the "Event-Middle" frames remain as robust as predicted.
+
+% ── References ───────────────────────────────────────────────
+\bibliographystyle{apalike}
+\begin{thebibliography}{9}
+
+\bibitem[Boltz(1992)]{boltz1992temporal}
+Boltz, M.~G. (1992). Temporal accent structure and the remembering of filmed
+narratives. \textit{Journal of Experimental Psychology: Human Perception and
+Performance}, \textit{18}(1), 90--105.
+
+\bibitem[Cutting et al.(2012)]{cutting2012hollywood}
+Cutting, J.~E., Brunick, K.~L., \& Candan, A. (2012). Perceiving event
+boundaries in Hollywood films. \textit{Psychonomic Bulletin \& Review},
+\textit{19}(1), 128--135.
+
+\bibitem[Radvansky \& Zacks(2017)]{radvansky2017event}
+Radvansky, G.~A., \& Zacks, J.~M. (2017). Event boundaries in memory and
+cognition. \textit{Current Opinion in Behavioral Sciences}, \textit{17}, 133--140.
+
+\bibitem[Schwan \& Garsoffky(2004)]{schwan2004discontinuities}
+Schwan, S., \& Garsoffky, B. (2004). The cognitive representation of filmic
+event summaries. \textit{Applied Cognitive Psychology}, \textit{18}(1), 37--55.
+
+\bibitem[Swallow et al.(2009)]{swallow2009operation}
+Swallow, K.~M., Zacks, J.~M., \& Abrams, R.~A. (2009). Event boundaries in
+perception affect memory encoding and updating. \textit{Journal of Experimental
+Psychology: General}, \textit{138}(2), 236--257.
+
+\bibitem[Zacks et al.(2007)]{zacks2007event}
+Zacks, J.~M., Speer, N.~K., Swallow, K.~M., Braver, T.~S., \& Reynolds,
+J.~R. (2007). Event perception: A mind--brain perspective. \textit{Psychological
+Bulletin}, \textit{133}(2), 273--293.
+
+\end{thebibliography}
+
+\end{document}

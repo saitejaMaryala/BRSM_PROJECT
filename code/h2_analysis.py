@@ -29,6 +29,8 @@ def load_bb_data():
             
             # Determine condition
             condition = 'AB' if '_AB_' in csv_file.name else ('NB' if '_NB_' in csv_file.name else 'Unknown')
+            if condition == 'Unknown':
+                continue
             participant_id = csv_file.stem.split('_')[0]
             
             # Extract trial data
@@ -62,9 +64,9 @@ def load_bb_data():
 
 def check_normality(data, variable, title):
     """Run Shapiro-Wilk test and plot distributions"""
-    
-    ab_data = data[data['condition'] == 'AB'][variable].dropna()
-    nb_data = data[data['condition'] == 'NB'][variable].dropna()
+    plot_data = data[data['condition'].isin(['AB', 'NB'])].copy()
+    ab_data = plot_data[plot_data['condition'] == 'AB'][variable].dropna()
+    nb_data = plot_data[plot_data['condition'] == 'NB'][variable].dropna()
     
     # Statistical tests
     stat_ab, p_ab = stats.shapiro(ab_data)
@@ -80,7 +82,7 @@ def check_normality(data, variable, title):
     plt.figure(figsize=(12, 5))
     
     plt.subplot(1, 2, 1)
-    sns.histplot(data=data, x=variable, hue='condition', kde=True, palette={'AB': '#FF6B6B', 'NB': '#4ECDC4'}, bins=15)
+    sns.histplot(data=plot_data, x=variable, hue='condition', kde=True, palette={'AB': '#FF6B6B', 'NB': '#4ECDC4'}, bins=15)
     plt.title(f'{title} Distribution')
     plt.xlabel('Accuracy (%)')
     
@@ -105,6 +107,21 @@ def check_normality(data, variable, title):
              
     plt.tight_layout()
     plt.savefig(OUTPUT_DIR / f'normality_{variable}.png', dpi=300)
+    plt.close()
+
+
+def plot_group_comparison(data, variable, title):
+    """Plot the raw BB accuracy distribution so the group separation is easy to inspect."""
+    plot_data = data[data['condition'].isin(['AB', 'NB'])].copy()
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='condition', y=variable, data=plot_data, palette={'AB': '#FF6B6B', 'NB': '#4ECDC4'})
+    sns.stripplot(x='condition', y=variable, data=plot_data, color='black', alpha=0.35, jitter=True)
+    plt.title(f'{title} Raw Scores by Condition')
+    plt.xlabel('Condition (AB = Abrupt, NB = Natural)')
+    plt.ylabel('Accuracy on BB Frames (%)')
+    plt.ylim(0, 105)
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / f'hypothesis_{variable}_stripbox.png', dpi=300)
     plt.close()
 
 
@@ -178,7 +195,8 @@ def main():
     print(f"\nAverage BB trials analyzed per participant: {df['bb_trial_count'].mean():.1f}")
     
     # Check H2 Normality 
-    # check_normality(df, 'accuracy_bb', 'Participant Mean Accuracy (BB Frames)')
+    check_normality(df, 'accuracy_bb', 'Participant Mean Accuracy (BB Frames)')
+    plot_group_comparison(df, 'accuracy_bb', 'Participant Mean Accuracy (BB Frames)')
     
     # Test H2: Accuracy on BB frames (Is NB > AB?)
     perform_mann_whitney(df, 'accuracy_bb', 'Participant Mean Accuracy (BB Frames)')

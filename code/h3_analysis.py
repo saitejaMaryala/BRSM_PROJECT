@@ -108,6 +108,20 @@ def check_normality(data, variable, title):
     plt.close()
 
 
+def plot_group_comparison(data, variable, title):
+    """Plot the raw EM accuracy distribution so the group separation is easy to inspect."""
+    plt.figure(figsize=(8, 6))
+    sns.boxplot(x='condition', y=variable, data=data, palette={'AB': '#FF6B6B', 'NB': '#4ECDC4'})
+    sns.stripplot(x='condition', y=variable, data=data, color='black', alpha=0.35, jitter=True)
+    plt.title(f'{title} Raw Scores by Condition')
+    plt.xlabel('Condition (AB = Abrupt, NB = Natural)')
+    plt.ylabel('Accuracy on EM Frames (%)')
+    plt.ylim(0, 105)
+    plt.tight_layout()
+    plt.savefig(OUTPUT_DIR / f'hypothesis_{variable}_stripbox.png', dpi=300)
+    plt.close()
+
+
 def perform_mann_whitney(data, variable, title):
     """Run Mann-Whitney U test and calculate effect size (Rank-Biserial Correlation)"""
     ab_data = data[data['condition'] == 'AB'][variable].dropna()
@@ -177,6 +191,7 @@ def main():
 
     # Check H3 Normality
     check_normality(df, 'accuracy_em', 'Participant Mean Accuracy (EM Frames)')
+    plot_group_comparison(df, 'accuracy_em', 'Participant Mean Accuracy (EM Frames)')
 
     # Test H3: Accuracy on EM frames (Expect NO significant difference)
     perform_mann_whitney(df, 'accuracy_em', 'Participant Mean Accuracy (EM Frames)')
